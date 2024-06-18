@@ -1,0 +1,82 @@
+library(tidyverse)
+library(readxl)
+library(performance)
+library(see)
+library(car)
+
+
+glimpse(Data_Tanaman_Padi)
+
+Data_Tanaman_Padi <- Data_Tanaman_Padi %>% mutate(Luas=as.factor(Luas))
+Data_Tanaman_Padi <- Data_Tanaman_Padi %>% mutate(Produksi=as.numeric(Produksi))
+Data_Tanaman_Padi <- Data_Tanaman_Padi %>% mutate(Curah_hujan=as.factor(Curah_hujan))
+glimpse(Data_Tanaman_Padi)
+
+anova_bat <- aov(Produksi~Luas+Curah_hujan+Luas:Curah_hujan,data=Data_Tanaman_Padi)
+
+broom::tidy(anova_bat) %>% mutate(p.value=round(p.value,3))
+
+sjPlot::plot_model(anova_bat,type = "int")+ggplot2::geom_line()
+
+anova_bat2 <- aov(Produksi~Luas+Curah_hujan,data=Data_Tanaman_Padi)
+
+# Honest Significant Difference (HSD) atau Tukey Test
+post_hsd <- DescTools::PostHocTest(anova_bat2,method="hsd")
+# Fisher Least Significant Difference (LSD) atau Tukey Test
+post_lsd <- DescTools::PostHocTest(anova_bat2,method="lsd")
+# Bonferroni Test
+post_bonf <- DescTools::PostHocTest(anova_bat2,method="bonf")
+# Duncan Test
+post_duncan <- DescTools::PostHocTest(anova_bat2,method="duncan")
+
+post_hsd
+post_lsd
+post_bonf
+post_duncan
+
+aug1 <- broom::augment(anova_bat)
+aug1
+
+plot(check_normality(x = anova_bat),type="pp")
+
+## Anderson-Darling
+install.packages("fBasics")
+print(fBasics::adTest(aug1 %>% pull(.resid)))
+
+## Kolmogorov Smnirnov
+fBasics::ksnormTest(aug1 %>% pull(.resid))
+
+## Jarque-Berra
+fBasics::jarqueberaTest(aug1 %>% pull(.resid))
+
+## Shapiro-Wilk
+fBasics::shapiroTest(aug1 %>% pull(.resid))
+
+ggpubr::ggscatter(data = aug1,x=".fitted",y=".resid",color = "steelblue")+
+  geom_hline(aes(yintercept=0))
+
+# Bartlett (asumsi residual menyebar normal)
+uji_bart <- function(x)
+{
+  method <- "Bartlett's test of sphericity"
+  data.name <- deparse(substitute(x))
+  x <- subset(x, complete.cases(x))
+  n <- nrow(x)
+  p <- ncol(x)
+  chisq <- (1-n+(2*p+5)/6)*log(det(cor(x)))
+  df <- p*(p-1)/2
+  p.value <- pchisq(chisq, df, lower.tail=FALSE)
+  names(chisq) <- "Khi-squared"
+  names(df) <- "df"
+  return(structure(list(statistic=chisq, parameter=df, p.value=p.value,
+                        method=method, data.name=data.name), class="htest"))
+}
+check_homogeneity(anova_bat,method="bartlett")
+
+# Levene (asumsi residual independen)
+try(check_homogeneity(anova_bat,method="levene"))
+
+# Fligner (merupakan uji nonparametrik)
+check_homogeneity(anova_bat,method="fligner")
+
+ggpubr::ggscatter(data = aug1 %>% mutate(order=seq(nrow(aug1))) ,x="order",y=".resid",color = "steelblue")
