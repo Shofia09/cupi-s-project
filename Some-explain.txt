@@ -1,0 +1,9 @@
+Jambu kristal banyak diminati di kalangan masyarakat, sehingga permintaan produksi pun terus meningkat dari waktu ke waktu. 
+Hal ini perlu didukung dengan teknologi budidaya yang intensif untuk mendapatkan kualitas buah yang baik. Salah satu faktor 
+penentu kualitas suatu buah dapat dilihat dari tingkat kematangannya, sehingga perlu penyortiran buah yang tepat untuk 
+melakukan panen. Penyortiran kematangan buah jambu kristal saat ini masih dilakukan secara konvensional dengan menganalisis 
+warna kulit buah secara visual mata manusia. Namun cara tersebut memiliki beberapa kelemahan, diantaranya tenaga yang 
+dibutuhkan lebih banyak dan membutuhkan proses yang relatif lama. Selain itu, penilaian manusia bersifat subjektif serta 
+tingkat akurasinya rendah dan tidak konsisten, mengingat warna kulit jambu kristal yang hampir sama dalam kondisi mentah 
+hingga matang. Oleh karena itu, pengolahan citra digital dibutuhkan untuk menentukan kematangan buah jambu kristal secara 
+otomatis serta meningkatkan akurasi sehingga dapat memperoleh informasi yang tepat.
